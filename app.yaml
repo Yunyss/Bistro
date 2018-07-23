@@ -8,6 +8,14 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+  
+- url: /Bistro\.js
+  static_files: Bistro.js
+  upload: Bistro\.js
+  
+- url: /Bistro\.css
+  static_files: Bistro.css
+  upload: Bistro\.css
 
 - url: .*
   script: main.app

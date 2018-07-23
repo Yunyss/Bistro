@@ -9,13 +9,13 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
   
-- url: /Bistro\.js
-  static_files: Bistro.js
-  upload: Bistro\.js
+- url: /main\.js
+  static_files: main.js
+  upload: main\.js
   
-- url: /Bistro\.css
-  static_files: Bistro.css
-  upload: Bistro\.css
+- url: /index\.css
+  static_files: index.css
+  upload: index\.css
 
 - url: .*
   script: main.app

@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9b30f6a6ea11f58e38ee5f6905c9dbd79f97537e
 import webapp2
 import jinja2
 import os
@@ -11,12 +14,20 @@ jinja_env = jinja2.Environment(
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from datetime import datetime
+<<<<<<< HEAD
 
 class ReserveHandler(webapp2.RequestHandler):
     def get(self):  # for a get request
         a_template = the_jinja_env.get_template('index.html')
         self.response.out.write(a_template.render())
 
+=======
+class ReserveHandler(webapp2.RequestHandler):
+    def get(self):  # for a get request
+        a_template = the_jinja_env.get_template('index.html')
+        self.response.out.write(a_template.render())
+
+>>>>>>> 9b30f6a6ea11f58e38ee5f6905c9dbd79f97537e
 class AppUser(ndb.Model):
   first_name = ndb.StringProperty()
   last_name = ndb.StringProperty()
@@ -45,16 +56,7 @@ class MainHandler(webapp2.RequestHandler):
         a_template = jinja_env.get_template('index.html')
         self.response.out.write(a_template.render())
     # Otherwise, the user isn't logged in!
-    else:
-      self.response.write('''
-        Please log in to use our site! <br>
-        <a href="%s">Sign in</a>''' % (
-          users.create_login_url('/')))
-  def post(self):
-    user = users.get_current_user()
-    if not user:
-      # You shouldn't be able to get here without being logged in
-      self.error(500)
+    self.error(500)
       return
     app_user = AppUser(
         first_name=self.request.get('first_name'),
@@ -65,11 +67,18 @@ class MainHandler(webapp2.RequestHandler):
         
     app_user.put()
     self.response.write("Thanks for signing up, your reservation is at" + str(app_user.time)  +  "with a group size of"  +  str(app_user.group_size))
+<<<<<<< HEAD
 
+=======
+    
+    
+    
+>>>>>>> 9b30f6a6ea11f58e38ee5f6905c9dbd79f97537e
 class RegisterHandler(webapp2.RequestHandler):
   def get(self):
     a_template = jinja_env.get_template('register.html')
     self.response.write(a_template.render())
+<<<<<<< HEAD
 
 class ReserveHandler(webapp2.RequestHandler):
   def get(self):
@@ -80,11 +89,23 @@ class HoursHandler(webapp2.RequestHandler):
   def get(self):
     a_template = jinja_env.get_template('location.html')
     self.response.write(a_template.render())
+=======
+    class ReserveHandler(webapp2.RequestHandler):
+  def get(self):
+    a_template = jinja_env.get_template('reserve.html')
+    self.response.write(a_template.render())
+
+>>>>>>> 9b30f6a6ea11f58e38ee5f6905c9dbd79f97537e
 
 
 app = webapp2.WSGIApplication([
 ('/', MainHandler),
 ('/register', RegisterHandler),
+<<<<<<< HEAD
 ('/hours', HoursHandler),
 ('/reserve', ReserveHandler)],
 debug=True)
+=======
+('/reserve', ReserveHandler)],
+debug=True)
+>>>>>>> 9b30f6a6ea11f58e38ee5f6905c9dbd79f97537e

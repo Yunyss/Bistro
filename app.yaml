@@ -8,6 +8,14 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+  
+- url: /main\.js
+  static_files: main.js
+  upload: main\.js
+  
+- url: /index\.css
+  static_files: index.css
+  upload: index\.css
 
 - url: /main\.js
   static_files: main.js

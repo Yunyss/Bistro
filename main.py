@@ -1,105 +1,75 @@
-"""Simple example app to demonstrate storing info for users.
-
-CSSI-ers!  If you want to have users log in to your site and store
-info about them, here is a simple AppEngine app demonstrating
-how to do that.  The typical usage is:
-
-- First, user visits the site, and sees a message to log in.
-- The user follows the link to the Google login page, and logs in.
-- The user is redirected back to your app's signup page to sign
-  up.
-- The user then gets a page thanking them for signup.
-
-- In the future, whenever the user is logged in, they'll see a 
-  message greeting them by name.
-
-Try logging out and logging back in with a fake email address
-to create a different account (when you "log in" running your
-local server, it doesn't ask for a password, and you can make
-up whatever email you like).
-
-The key piece that makes all of this work is tying the datastore
-entity to the AppEngine user id, by passing the special property
-id when creating the datastore entity.
-
-cssi_user = CssiUser(..., id=user.user_id())
-cssi_user.put()
-
-and then, looking it up later by doing
-
-cssi_user = CssiUser.get_by_id(user.user_id())
-"""
-
 import webapp2
+import jinja2
+import os
+
+jinja_env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from datetime import datetime
+class ReserveHandler(webapp2.RequestHandler):
+    def get(self):  # for a get request
+        a_template = the_jinja_env.get_template('index.html')
+        self.response.out.write(a_template.render())
 
-class CssiUser(ndb.Model):
-  """CssiUser stores information about a logged-in user.
-
-  The AppEngine users api stores just a couple of pieces of
-  info about logged-in users: a unique id and their email address.
-
-  If you want to store more info (e.g. their real name, high score,
-  preferences, etc, you need to create a Datastore model like this
-  example).  
-  """
+class AppUser(ndb.Model):
   first_name = ndb.StringProperty()
   last_name = ndb.StringProperty()
-  time = ndb.StringProperty()
-  group_size = ndb.StringProperty()
-
+  time = ndb.DateTimeProperty()
+  group_size = ndb.IntegerProperty()
+  
 class MainHandler(webapp2.RequestHandler):
   def get(self):
     user = users.get_current_user()
     # If the user is logged in...
     if user:
       email_address = user.nickname()
-      cssi_user = CssiUser.get_by_id(user.user_id())
+      app_user = AppUser.get_by_id(user.user_id())
       signout_link_html = '<a href="%s">sign out</a>' % (
           users.create_logout_url('/'))
       # If the user has previously been to our site, we greet them!
-      if cssi_user:
+      if app_user:
         self.response.write('''
             Welcome %s %s (%s)! <br> %s <br>''' % (
-              cssi_user.first_name,
-              cssi_user.last_name,
+              app_user.first_name,
+              app_user.last_name,
               email_address,
               signout_link_html))
       # If the user hasn't been to our site, we ask them to sign up
       else:
-        self.response.write('''
-            Welcome to our site, %s!  Please sign up! <br>
-            <form method="post" action="/">
-            <input type="text" name="first_name">
-            <input type="text" name="last_name">
-            <input type="text" name="time">
-            <input type="text" name="group_size">
-            <input type="submit">
-            </form><br> %s <br>
-            ''' % (email_address, signout_link_html))
+        a_template = jinja_env.get_template('index.html')
+        self.response.out.write(a_template.render())
     # Otherwise, the user isn't logged in!
-    else:
-      self.response.write('''
-        Please log in to use our site! <br>
-        <a href="%s">Sign in</a>''' % (
-          users.create_login_url('/')))
-  def post(self):
-    user = users.get_current_user()
-    if not user:
-      # You shouldn't be able to get here without being logged in
-      self.error(500)
+    self.error(500)
       return
-    cssi_user = CssiUser(
+    app_user = AppUser(
         first_name=self.request.get('first_name'),
         last_name=self.request.get('last_name'),
-        time=self.request.get('time'),
-        group_size=self.request.get('group_size'),
+        time=datetime.strptime(self.request.get('time'), "%m/%d/%Y %I:%M%p"),
+        group_size=int(self.request.get('group_size')),
         id=user.user_id())
-    cssi_user.put()
-    self.response.write("Thanks for signing up, your reservation is at" + str(cssi_user.time) + "with a group size of" + str(cssi_user.group_size))
+        
+    app_user.put()
+    self.response.write("Thanks for signing up, your reservation is at" + str(app_user.time)  +  "with a group size of"  +  str(app_user.group_size))
+    
+    
+    
+class RegisterHandler(webapp2.RequestHandler):
+  def get(self):
+    a_template = jinja_env.get_template('register.html')
+    self.response.write(a_template.render())
+    class ReserveHandler(webapp2.RequestHandler):
+  def get(self):
+    a_template = jinja_env.get_template('reserve.html')
+    self.response.write(a_template.render())
+
+
 
 app = webapp2.WSGIApplication([
-('/', MainHandler)],
+('/', MainHandler),
+('/register', RegisterHandler),
+('/reserve', ReserveHandler)],
 debug=True)
